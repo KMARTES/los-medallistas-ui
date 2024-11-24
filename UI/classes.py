@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 
-BASE_URL = "https://los-medallistas-c59825198b5f.herokuapp.com/los-medallistas/"
+BASE_URL = "https://streamlit-for-medallistas-e611ec6e2503.herokuapp.com/los-medallistas/"
 
 login_page = st.Page("../UI/login.py", title="Log In", icon=":material/login:")
 logout_page = st.Page("../UI/logout.py", title="Log Out", icon=":material/logout:")
@@ -57,7 +57,7 @@ if st.session_state.logged_in:
     def allClasses():
         st.header("All Rooms")
         try:
-            response = requests.get(f"{BASE_URL}/class")
+            response = requests.get(f"{BASE_URL}class")
             if response.status_code == 200:
                 classes = response.json()
 
@@ -83,7 +83,7 @@ if st.session_state.logged_in:
 
         if st.session_state.cid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/class/{st.session_state.cid}")
+                response = requests.get(f"{BASE_URL}class/{st.session_state.cid}")
 
                 if response.status_code == 200:
                     result = response.json()

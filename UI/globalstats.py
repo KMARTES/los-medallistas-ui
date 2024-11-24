@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 
-BASE_URL = "https://los-medallistas-c59825198b5f.herokuapp.com/los-medallistas/"
+BASE_URL = "https://streamlit-for-medallistas-e611ec6e2503.herokuapp.com/los-medallistas/"
 
 login_page = st.Page("../UI/login.py", title="Log In", icon=":material/login:")
 logout_page = st.Page("../UI/logout.py", title="Log Out", icon=":material/logout:")
