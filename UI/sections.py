@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 
+
 BASE_URL = "https://streamlit-for-medallistas-e611ec6e2503.herokuapp.com/los-medallistas/"
 
 login_page = st.Page("../UI/login.py", title="Log In", icon=":material/login:")
@@ -370,7 +371,7 @@ if st.session_state.logged_in:
         cid = st.text_input("Class ID:")
         mid = st.text_input("Meeting ID:")
         semester = st.text_input("Semester: Format -> Spring")
-        year = st.text_input("Years:")
+        years = st.text_input("Year:")
         capacity = st.text_input("Capacity:")
 
         if st.button("Add", type="primary"):
@@ -378,17 +379,16 @@ if st.session_state.logged_in:
             st.session_state.cid = cid
             st.session_state.mid = mid
             st.session_state.semester = semester
-            st.session_state.years = year
+            st.session_state.years = years
             st.session_state.capacity = capacity
             st.session_state.set_button = True
 
-            data = {"roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": year, "capacity": capacity}
+            data = {"roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": years, "capacity": int(capacity)}
 
         if st.session_state.roomid and st.session_state.cid and st.session_state.mid and st.session_state.semester and st.session_state.years and st.session_state.capacity:
             try:
                 response = requests.post(f"{BASE_URL}section", json= data)
-                st.write(data)
-                st.write(response.text)
+
                 if response.status_code in [200, 201]:
                     result = response.json()
 
@@ -409,20 +409,20 @@ if st.session_state.logged_in:
         cid = st.text_input("Class ID:")
         mid = st.text_input("Meeting ID:")
         semester = st.text_input("Semester: Format -> Spring")
-        year = st.text_input("Years:")
+        years = st.text_input("Years:")
         capacity = st.text_input("Capacity:")
 
-        if st.button("Add", type="primary"):
+        if st.button("Update", type="primary"):
             st.session_state.sid = sid
             st.session_state.roomid = roomid
             st.session_state.cid = cid
             st.session_state.mid = mid
             st.session_state.semester = semester
-            st.session_state.years = year
+            st.session_state.years = years
             st.session_state.capacity = capacity
             st.session_state.set_button = True
 
-            data = {"sid": sid, "roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": year, "capacity": capacity}
+            data = {"sid": sid, "roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": years, "capacity": int(capacity)}
 
         if st.session_state.sid and st.session_state.roomid and st.session_state.cid and st.session_state.mid and st.session_state.semester and st.session_state.years and st.session_state.capacity:
             try:
