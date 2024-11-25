@@ -1,15 +1,15 @@
 import streamlit as st
+import requests
 
-BASE_URL = "https://los-medallistas-c59825198b5f.herokuapp.com/"
-
-USER = {
-    "kmart": "kmart12345",
-    "serrano": "serrano12345"
-}
-
+BASE_URL = "https://streamlit-for-medallistas-e611ec6e2503.herokuapp.com/login"
 
 def authenticate(username, password):
-    return USER.get(username) == password
+    data = {"username": username, "password": password}
+    response = requests.post(BASE_URL, json=data)
+    if response.status_code == 200:
+        return True
+    else:
+        return False
 
 
 # Initialize session state
@@ -17,7 +17,6 @@ if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    # Login form
     st.title("Login")
 
     username = st.text_input("Username")

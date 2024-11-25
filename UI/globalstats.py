@@ -47,7 +47,7 @@ if st.session_state.logged_in:
         st.header("Top 5 Meetings with the Most Sections.")
 
         try:
-            response = requests.post(f"{BASE_URL}/most/meeting")
+            response = requests.post(f"{BASE_URL}most/meeting")
             if response.status_code == 200:
                 result = response.json()
 
@@ -70,17 +70,17 @@ if st.session_state.logged_in:
         st.header("Top 3 Classes That Appears the Most as Prerequisite to Other Classes.")
 
         try:
-            response = requests.post(f"{BASE_URL}/most/prerequisite")
+            response = requests.post(f"{BASE_URL}most/prerequisite")
             if response.status_code == 200:
                 result = response.json()
 
                 if result:
                     df = pd.DataFrame(result)
-                    df.set_index(df['cdesc'], inplace=True)
-                    st.dataframe(df, hide_index=True, column_order=['cdesc', 'appearances'])
+                    df.set_index(df['ccode'], inplace=True)
+                    st.dataframe(df, hide_index=True, column_order=['cname', 'ccode', 'appearances'])
                     st.divider()
                     st.divider()
-                    st.bar_chart(df['appearances'], x_label='Appearances', y_label='Courses', color=(190,197,105), horizontal=True, height=500)
+                    st.bar_chart(df['appearances'], x_label='Appearances', y_label='Course Code', color=(190,197,105), horizontal=True, height=500)
                 else:
                     st.error("Stat is unavailable.")
             else:
@@ -92,17 +92,17 @@ if st.session_state.logged_in:
         st.header("Top 3 Classes that were Offered the Least.")
 
         try:
-            response = requests.post(f"{BASE_URL}/least/classes")
+            response = requests.post(f"{BASE_URL}least/classes")
             if response.status_code == 200:
                 result = response.json()
 
                 if result:
                     df = pd.DataFrame(result)
-                    df.set_index(df['cdesc'], inplace=True)
-                    st.dataframe(df, hide_index=True, column_order=['cdesc', 'total_sections'])
+                    df.set_index(df['ccode'], inplace=True)
+                    st.dataframe(df, hide_index=True, column_order=['cname', 'ccode', 'total_sections'])
                     st.divider()
                     st.divider()
-                    st.bar_chart(df['total_sections'], x_label='Total Sections', y_label='Courses', color=(190,197,105), horizontal=True, height=500)
+                    st.bar_chart(df['total_sections'], x_label='Total Sections', y_label='Course Code', color=(190,197,105), horizontal=True, height=500)
             else:
                 st.error("Failed to fetch requested data.")
         except Exception as e:
@@ -112,7 +112,7 @@ if st.session_state.logged_in:
         st.header("Total Number of Sections per Year")
 
         try:
-            response = requests.post(f"{BASE_URL}/section/year")
+            response = requests.post(f"{BASE_URL}section/year")
             if response.status_code == 200:
                 result = response.json()
 
@@ -136,3 +136,5 @@ if st.session_state.logged_in:
         leastClasses()
     if st.session_state.selected_option == "Total Sections":
         totalSections()
+else:
+    st.switch_page("../UI/login.py")

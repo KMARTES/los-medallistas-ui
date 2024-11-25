@@ -96,7 +96,7 @@ if st.session_state.logged_in:
     def allSections():
         st.header("All Sections")
         try:
-            response = requests.get(f"{BASE_URL}/section")
+            response = requests.get(f"{BASE_URL}section")
             if response.status_code == 200:
                 sections = response.json()
 
@@ -121,7 +121,7 @@ if st.session_state.logged_in:
 
         if st.session_state.sid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/{st.session_state.sid}")
+                response = requests.get(f"{BASE_URL}section/{st.session_state.sid}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -149,7 +149,7 @@ if st.session_state.logged_in:
 
         if st.session_state.roomid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/roomid={st.session_state.roomid}")
+                response = requests.get(f"{BASE_URL}section/roomid={st.session_state.roomid}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -177,7 +177,7 @@ if st.session_state.logged_in:
 
         if st.session_state.cid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/cid={st.session_state.cid}")
+                response = requests.get(f"{BASE_URL}section/cid={st.session_state.cid}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -205,7 +205,7 @@ if st.session_state.logged_in:
 
         if st.session_state.mid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/mid={st.session_state.mid}")
+                response = requests.get(f"{BASE_URL}section/mid={st.session_state.mid}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -233,7 +233,7 @@ if st.session_state.logged_in:
 
         if st.session_state.semester:
             try:
-                response = requests.get(f"{BASE_URL}/section/semester={st.session_state.semester}")
+                response = requests.get(f"{BASE_URL}section/semester={st.session_state.semester}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -261,7 +261,7 @@ if st.session_state.logged_in:
 
         if st.session_state.years:
             try:
-                response = requests.get(f"{BASE_URL}/section/years={st.session_state.years}")
+                response = requests.get(f"{BASE_URL}section/years={st.session_state.years}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -289,7 +289,7 @@ if st.session_state.logged_in:
 
         if st.session_state.capacity.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/capacity={st.session_state.capacity}")
+                response = requests.get(f"{BASE_URL}section/capacity={st.session_state.capacity}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -317,7 +317,7 @@ if st.session_state.logged_in:
 
         if st.session_state.capacity.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/capacity:over={st.session_state.capacity}")
+                response = requests.get(f"{BASE_URL}section/capacity:over={st.session_state.capacity}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -345,7 +345,7 @@ if st.session_state.logged_in:
 
         if st.session_state.capacity.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/section/capacity:under={st.session_state.capacity}")
+                response = requests.get(f"{BASE_URL}section/capacity:under={st.session_state.capacity}")
 
                 if response.status_code == 200:
                     result = response.json()
@@ -362,6 +362,108 @@ if st.session_state.logged_in:
                 st.error(f"An error has occurred: {e}")
         else:
             st.warning("Please enter a number.")
+
+    def addSection():
+        st.header("Add Section")
+
+        roomid = st.text_input("Room ID:")
+        cid = st.text_input("Class ID:")
+        mid = st.text_input("Meeting ID:")
+        semester = st.text_input("Semester: Format -> Spring")
+        year = st.text_input("Years:")
+        capacity = st.text_input("Capacity:")
+
+        if st.button("Add", type="primary"):
+            st.session_state.roomid = roomid
+            st.session_state.cid = cid
+            st.session_state.mid = mid
+            st.session_state.semester = semester
+            st.session_state.years = year
+            st.session_state.capacity = capacity
+            st.session_state.set_button = True
+
+            data = {"roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": year, "capacity": capacity}
+
+        if st.session_state.roomid and st.session_state.cid and st.session_state.mid and st.session_state.semester and st.session_state.years and st.session_state.capacity:
+            try:
+                response = requests.post(f"{BASE_URL}section", json= data)
+                st.write(data)
+                st.write(response.text)
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.write(str([result]))
+                    else:
+                        st.warning("No data added to Section table.")
+                else:
+                    st.error(f"Failed to add Section: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
+
+    def updateSection():
+        st.header("Update Section")
+
+        sid = st.text_input("Section ID:")
+        roomid = st.text_input("Room ID:")
+        cid = st.text_input("Class ID:")
+        mid = st.text_input("Meeting ID:")
+        semester = st.text_input("Semester: Format -> Spring")
+        year = st.text_input("Years:")
+        capacity = st.text_input("Capacity:")
+
+        if st.button("Add", type="primary"):
+            st.session_state.sid = sid
+            st.session_state.roomid = roomid
+            st.session_state.cid = cid
+            st.session_state.mid = mid
+            st.session_state.semester = semester
+            st.session_state.years = year
+            st.session_state.capacity = capacity
+            st.session_state.set_button = True
+
+            data = {"sid": sid, "roomid": roomid, "cid": cid, "mid": mid, "semester": semester, "years": year, "capacity": capacity}
+
+        if st.session_state.sid and st.session_state.roomid and st.session_state.cid and st.session_state.mid and st.session_state.semester and st.session_state.years and st.session_state.capacity:
+            try:
+                response = requests.put(f"{BASE_URL}section/{st.session_state.sid}", json=data)
+
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.write(str([result]))
+                    else:
+                        st.warning("No data added to Section table.")
+                else:
+                    st.error(f"Failed to update Section: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
+
+    def deleteSection():
+        st.header("Delete Section By Section ID")
+
+        sid = st.text_input("Section ID:")
+
+        if st.button("Delete", type="primary"):
+            st.session_state.sid = sid
+            st.session_state.set_button = True
+
+        if st.session_state.sid:
+            try:
+                response = requests.delete(f"{BASE_URL}section/{st.session_state.sid}")
+
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.write(str([result]))
+                    else:
+                        st.warning("No section ID was found.")
+                else:
+                    st.error(f"Failed to delete section: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
 
     if st.session_state.option == "All Sections":
         allSections()
@@ -395,12 +497,15 @@ if st.session_state.logged_in:
                 clear()
                 sectionsByCapacityUnder()
 
-    # if selected_option == "Add Class":
-    #     addClass()
-    # if selected_option == "Update Class":
-    #     updateClass()
-    # if selected_option == "DeleteClass":
-    #     deleteClass()
+    if st.session_state.option == "Add Section":
+        clear()
+        addSection()
+    if st.session_state.option == "Update Section":
+        clear()
+        updateSection()
+    if st.session_state.option == "Delete Section":
+        clear()
+        deleteSection()
 else:
     st.session_state.logged_in = False
     st.switch_page("../UI/login.py")

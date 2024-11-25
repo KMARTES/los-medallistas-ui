@@ -49,26 +49,35 @@ if st.session_state.logged_in:
     if "set_button" not in st.session_state:
         st.session_state.set_button = False
 
+    if "ccode" "starttime" "endtime" "cdays" not in st.session_state:
+        st.session_state.ccode = ""
+        st.session_state.starttime = ""
+        st.session_state.endtime = ""
+        st.session_state.cdays = ""
 
     def clear():
         st.session_state.mid = ""
+        st.session_state.ccode = ""
+        st.session_state.starttime = ""
+        st.session_state.endtime = ""
+        st.session_state.cdays = ""
         st.session_state.set_button = False
 
 
     def allMeetings():
         st.header("All Meetings")
         try:
-            response = requests.get(f"{BASE_URL}/meeting")
+            response = requests.get(f"{BASE_URL}meeting")
             if response.status_code == 200:
                 meetings = response.json()
 
                 df = pd.DataFrame(meetings)
-                st.dataframe(df, hide_index=True, height=500)
+                st.dataframe(df, hide_index=True, height=500, column_order=['mid', 'ccode', 'starttime', 'endtime', 'cdays'])
                 st.divider()
                 st.divider()
                 st.bar_chart(df['cdays'].value_counts(), x_label='Days', y_label='Meetings', color=(187, 105, 105), height=500)
             else:
-                st.error("Failed to fetch meetings.")
+                st.error(f"Failed to fetch meetings: {response.status_code} - {response.text}")
         except Exception as e:
             st.error(f"An error has occurred: {e}")
 
@@ -81,18 +90,111 @@ if st.session_state.logged_in:
 
         if st.session_state.mid.isnumeric():
             try:
-                response = requests.get(f"{BASE_URL}/meeting/{st.session_state.mid}")
+                response = requests.get(f"{BASE_URL}meeting/{st.session_state.mid}")
 
                 if response.status_code == 200:
                     result = response.json()
 
                     if result:
                         df = pd.DataFrame([result])
-                        st.dataframe(df, hide_index=True, height=500)
+                        st.dataframe(df, hide_index=True, column_order=['mid', 'ccode', 'starttime', 'endtime', 'cdays'])
                     else:
-                        st.warning("No data found for the Room ID")
+                        st.warning("No data found for the Meeting ID")
                 else:
-                    st.error(f"Failed to fetch Room: {response.status_code}")
+                    st.error(f"Failed to fetch meeting: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
+
+    def addMeeting():
+        st.header("Add Meeting")
+
+        ccode = st.text_input("Meeting Code:")
+        starttime = st.text_input("Meeting Start Time: Format -> 00:00:00")
+        endtime = st.text_input("Meeting End Time: Format -> 00:00:00")
+        cdays = st.text_input("Meeting Days:")
+
+        if st.button("Add", type='primary'):
+            st.session_state.set_button = True
+            st.session_state.ccode = ccode
+            st.session_state.starttime = pd.to_datetime(starttime).strftime("%H:%M:%S")
+            st.session_state.endtime = pd.to_datetime(endtime).strftime("%H:%M:%S")
+            st.session_state.cdays = cdays
+
+            data = {"ccode": ccode, "starttime": st.session_state.starttime, "endtime": st.session_state.endtime, "cdays": cdays}
+
+        if st.session_state.ccode and st.session_state.starttime and st.session_state.endtime and st.session_state.cdays:
+            try:
+                response = requests.post(f"{BASE_URL}meeting", json=data)
+
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.dataframe([result])
+                    else:
+                        st.warning("No data added to Meeting table.")
+                else:
+                    st.error(f"Failed to add meeting: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
+
+    def updateMeeting():
+        st.header("Update Meeting")
+
+        mid = st.text_input("Meeting ID:")
+        ccode = st.text_input("Meeting Code:")
+        starttime = st.text_input("Meeting Start Time: Format -> 00:00:00")
+        endtime = st.text_input("Meeting End Time: Format -> 00:00:00")
+        cdays = st.text_input("Meeting Days:")
+
+        if st.button("Update", type='primary'):
+            st.session_state.set_button = True
+            st.session_state.mid = mid
+            st.session_state.ccode = ccode
+            st.session_state.starttime = pd.to_datetime(starttime).strftime("%H:%M:%S")
+            st.session_state.endtime = pd.to_datetime(endtime).strftime("%H:%M:%S")
+            st.session_state.cdays = cdays
+
+            data = {"mid": mid, "ccode": ccode, "starttime": st.session_state.starttime, "endtime": st.session_state.endtime, "cdays": cdays}
+
+        if st.session_state.mid and st.session_state.ccode and st.session_state.starttime and st.session_state.endtime and st.session_state.cdays:
+            try:
+                response = requests.put(f"{BASE_URL}meeting/{mid}", json=data)
+
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.dataframe([result])
+                    else:
+                        st.warning("No data added to Meeting table.")
+                else:
+                    st.error(f"Failed to update meeting; verify parameters: {response.status_code} - {response.text}")
+            except Exception as e:
+                st.error(f"An error has occurred: {e}")
+
+    def deleteMeeting():
+        st.header("Delete Meeting by MID")
+
+        val = st.text_input("Meeting ID:")
+
+        if st.button("Delete", type='primary'):
+            st.session_state.set_button = True
+            st.session_state.mid = val
+
+        if st.session_state.mid:
+            try:
+                response = requests.delete(f"{BASE_URL}meeting/{val}")
+
+                if response.status_code in [200, 201]:
+                    result = response.json()
+
+                    if result:
+                        st.dataframe([result])
+                    else:
+                        st.warning("No meeting ID found.")
+                else:
+                    st.error(f"Failed to delete meeting: {response.status_code} - {response.text}")
             except Exception as e:
                 st.error(f"An error has occurred: {e}")
 
@@ -101,12 +203,15 @@ if st.session_state.logged_in:
     if st.session_state.option == "Get Meeting":
         clear()
         meetingByMID()
-    # if selected_option == "Add Class":
-    #     addClass()
-    # if selected_option == "Update Class":
-    #     updateClass()
-    # if selected_option == "DeleteClass":
-    #     deleteClass()
+    if st.session_state.option == "Add Meeting":
+        clear()
+        addMeeting()
+    if st.session_state.option == "Update Meeting":
+        clear()
+        updateMeeting()
+    if st.session_state.option == "Delete Meeting":
+        clear()
+        deleteMeeting()
 else:
     st.session_state.logged_in = False
     st.switch_page("../UI/login.py")
